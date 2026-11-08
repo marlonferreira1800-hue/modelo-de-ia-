@@ -1,50 +1,68 @@
-# ULTRA 64 Cloud Deck - Inicializador Automatico Windows PowerShell
+# ULTRA 64 Cloud Deck - Instalador e Inicializador 1-Clique Windows PowerShell
 $ErrorActionPreference = "SilentlyContinue"
-$workdir = Split-Path -Parent $MyInvocation.MyCommand.Path
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+$workdir = Join-Path $env:USERPROFILE "Ultra64_N64"
+New-Item -ItemType Directory -Force -Path $workdir | Out-Null
 Set-Location $workdir
 
 Write-Host "====================================================" -ForegroundColor Cyan
-Write-Host "  ULTRA 64 CLOUD DECK - PROCURANDO MARIO KART 64... " -ForegroundColor Yellow
+Write-Host "  BAIXANDO CONSOLE NINTENDO 64 (ULTRA 64 DECK)...   " -ForegroundColor Yellow
 Write-Host "====================================================" -ForegroundColor Cyan
+
+$baseUrl = "https://raw.githubusercontent.com/marlonferreira1800-hue/modelo-de-ia-/main"
+foreach ($f in @("index.html", "index.css", "app.js")) {
+    Invoke-WebRequest -Uri "$baseUrl/$f" -OutFile (Join-Path $workdir $f) -UseBasicParsing
+}
+
+Write-Host "[OK] Arquivos do emulador prontos em $workdir" -ForegroundColor Green
+Write-Host "Procurando Mario Kart 64 (Europe) em Downloads..." -ForegroundColor Yellow
 
 $downloads = Join-Path $env:USERPROFILE "Downloads"
 $romFile = Get-ChildItem -Path $downloads -Recurse -File | Where-Object {
-    ($_.Name -like "*Mario Kart 64*") -and ($_.Extension -in @(".z64", ".n64", ".v64", ".zip", ".rom"))
+    ($_.Name -like "*Mario Kart*") -and ($_.Extension -in @(".z64", ".n64", ".v64", ".zip", ".rom", ".7z"))
 } | Select-Object -First 1
 
 if (-not $romFile) {
     $folderPath = Join-Path $downloads "Mario Kart 64 (Europe)"
     if (Test-Path $folderPath) {
-        $romFile = Get-ChildItem -Path $folderPath -Recurse -File | Select-Object -First 1
+        if ((Get-Item $folderPath) -is [System.IO.DirectoryInfo]) {
+            $romFile = Get-ChildItem -Path $folderPath -Recurse -File | Select-Object -First 1
+        } else {
+            $romFile = Get-Item $folderPath
+        }
     }
 }
 
 $queryParam = ""
 if ($romFile) {
-    $destName = "mariokart64" + $romFile.Extension
+    $ext = if ($romFile.Extension) { $romFile.Extension } else { ".z64" }
+    $destName = "mariokart64" + $ext
     $destPath = Join-Path $workdir $destName
     Copy-Item -Path $romFile.FullName -Destination $destPath -Force
-    Write-Host "[OK] ROM Encontrada: $($romFile.FullName)" -ForegroundColor Green
+    Write-Host "[OK] ROM Mario Kart 64 encontrada: $($romFile.FullName)" -ForegroundColor Green
     $queryParam = "?rom=$destName"
 } else {
-    Write-Host "[AVISO] Arraste o arquivo da ROM na janela do navegador que vai abrir!" -ForegroundColor Yellow
+    Write-Host "[AVISO] Nao achei automaticamente em Downloads. Arraste a ROM na tela do navegador!" -ForegroundColor Yellow
 }
 
-$port = 8080
+$port = 8085
 $url = "http://localhost:$port/$queryParam"
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
 $listener.Start()
 
-Write-Host "[OK] Servidor Nintendo 64 rodando em: $url" -ForegroundColor Green
-Write-Host "Abrindo navegador... (Pressione Ctrl+C para encerrar)" -ForegroundColor Cyan
+Write-Host "====================================================" -ForegroundColor Green
+Write-Host "  ABRINDO NINTENDO 64 EM: $url" -ForegroundColor Green
+Write-Host "====================================================" -ForegroundColor Green
 Start-Process $url
 
 while ($listener.IsListening) {
     $context = $listener.GetContext()
     $req = $context.Request
     $res = $context.Response
+    $res.Headers.Add("Access-Control-Allow-Origin", "*")
 
     $localPath = $req.Url.LocalPath.TrimStart('/')
     if ([string]::IsNullOrEmpty($localPath)) { $localPath = "index.html" }
