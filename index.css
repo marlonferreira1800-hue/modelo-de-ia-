@@ -1,0 +1,548 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-deck: hsl(220, 14%, 10%);
+  --bg-surface: hsl(220, 13%, 14%);
+  --bg-elevated: hsl(220, 12%, 18%);
+  --bg-cartridge: hsl(220, 10%, 22%);
+  --border-subtle: hsl(220, 12%, 24%);
+  --border-strong: hsl(220, 12%, 32%);
+
+  --text-primary: hsl(210, 20%, 96%);
+  --text-secondary: hsl(215, 14%, 72%);
+  --text-muted: hsl(215, 12%, 52%);
+
+  /* Authentic N64 Controller Button Palette */
+  --n64-red: hsl(355, 82%, 56%);
+  --n64-blue: hsl(214, 88%, 54%);
+  --n64-green: hsl(142, 72%, 44%);
+  --n64-yellow: hsl(45, 96%, 54%);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-deck: 0 18px 40px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-deck);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header & Console Top Bar */
+.console-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.n64-badge {
+  display: grid;
+  grid-template-columns: repeat(2, 10px);
+  grid-template-rows: repeat(2, 10px);
+  gap: 3px;
+  padding: 6px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+}
+
+.n64-badge span:nth-child(1) { background: var(--n64-green); border-radius: 2px; }
+.n64-badge span:nth-child(2) { background: var(--n64-blue); border-radius: 2px; }
+.n64-badge span:nth-child(3) { background: var(--n64-yellow); border-radius: 2px; }
+.n64-badge span:nth-child(4) { background: var(--n64-red); border-radius: 2px; }
+
+.brand-title h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.brand-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.hardware-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.telemetry-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.7rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.led-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--n64-red);
+  box-shadow: 0 0 8px var(--n64-red);
+}
+
+.led-dot.online {
+  background: var(--n64-green);
+  box-shadow: 0 0 8px var(--n64-green);
+}
+
+/* Main Layout */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.25rem;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+}
+
+@media (max-width: 1080px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TV / Monitor Stage */
+.stage-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tv-frame {
+  position: relative;
+  background: #07080a;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-strong);
+  box-shadow: var(--shadow-deck);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  max-height: 70vh;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#n64-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+#emulatorjs-container {
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+/* Optional CRT Scanlines Overlay */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.28) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 5;
+}
+
+.tv-frame.crt-active .crt-overlay {
+  opacity: 1;
+}
+
+/* In-Game HUD Overlay */
+.stage-hud {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  right: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.hud-box {
+  background: rgba(12, 14, 18, 0.82);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.hud-box strong {
+  color: var(--n64-yellow);
+}
+
+/* Stage Action Toolbar */
+.stage-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--bg-cartridge);
+  border-color: var(--text-secondary);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--n64-blue);
+  border-color: hsl(214, 88%, 64%);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: hsl(214, 88%, 48%);
+}
+
+.btn-success {
+  background: var(--n64-green);
+  border-color: hsl(142, 72%, 52%);
+  color: #fff;
+}
+
+.btn-danger {
+  background: var(--n64-red);
+  border-color: hsl(355, 82%, 64%);
+  color: #fff;
+}
+
+/* Sidebar Panel */
+.sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.panel-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Cartridge Rack */
+.cartridge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cartridge-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  color: var(--text-primary);
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.cartridge-item:hover {
+  background: var(--bg-cartridge);
+  border-color: var(--border-strong);
+  transform: translateX(2px);
+}
+
+.cartridge-item.active {
+  background: hsl(214, 35%, 20%);
+  border-color: var(--n64-blue);
+}
+
+.cart-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.cart-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.cart-desc {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.cart-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--n64-yellow);
+  white-space: nowrap;
+}
+
+/* Real ROM Dropzone */
+.rom-dropzone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.rom-dropzone:hover, .rom-dropzone.dragover {
+  border-color: var(--n64-yellow);
+  background: rgba(250, 204, 21, 0.06);
+}
+
+.rom-dropzone p {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.rom-dropzone span {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Interactive N64 Controller Pad */
+.controller-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.pad-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dpad-cross, .cpad-cross {
+  display: grid;
+  grid-template-columns: repeat(3, 30px);
+  grid-template-rows: repeat(3, 30px);
+  gap: 3px;
+}
+
+.pad-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.pad-btn:active, .pad-btn.pressed {
+  transform: scale(0.92);
+  filter: brightness(1.35);
+}
+
+.pad-btn.c-btn {
+  background: var(--n64-yellow);
+  color: #111;
+  border-color: hsl(45, 96%, 40%);
+  border-radius: 50%;
+}
+
+.ab-cluster {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.pad-btn.btn-a {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--n64-blue);
+  color: #fff;
+}
+
+.pad-btn.btn-b {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--n64-green);
+  color: #fff;
+}
+
+.pad-btn.btn-start {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--n64-red);
+  color: #fff;
+}
+
+.pad-btn.btn-z {
+  padding: 0.3rem 0.75rem;
+  background: var(--bg-cartridge);
+  border-color: var(--border-strong);
+  font-size: 0.75rem;
+}
+
+.analog-well {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #0c0e12;
+  border: 2px solid var(--border-strong);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.analog-stick {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: hsl(220, 10%, 75%);
+  border: 2px solid #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  transition: transform 0.04s linear;
+}
+
+.key-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.key-legend kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
