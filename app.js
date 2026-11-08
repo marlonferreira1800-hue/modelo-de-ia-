@@ -978,17 +978,15 @@
   // =========================================================================
   // REAL N64 ROM LOADER (EmulatorJS Mupen64Plus-Next WebAssembly Core)
   // =========================================================================
-  function bootRealN64Rom(file) {
-    if (!file) return;
+  function bootRealN64RomUrl(romUrl, romLabel) {
     activeCart = 'realrom';
     canvas.style.display = 'none';
     stageHud.style.display = 'none';
     ejsContainer.style.display = 'block';
     ejsContainer.innerHTML = '<div id="ejs-game" style="width:100%;height:100%;"></div>';
 
-    statusText.textContent = `ROM: ${file.name.toUpperCase()}`;
+    statusText.textContent = `ROM: ${romLabel.toUpperCase()}`;
 
-    const romUrl = URL.createObjectURL(file);
     window.EJS_player = '#ejs-game';
     window.EJS_core = 'n64';
     window.EJS_gameUrl = romUrl;
@@ -1002,6 +1000,12 @@
     script.id = 'ejs-loader-script';
     script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
     document.body.appendChild(script);
+  }
+
+  function bootRealN64Rom(file) {
+    if (!file) return;
+    const romUrl = URL.createObjectURL(file);
+    bootRealN64RomUrl(romUrl, file.name);
   }
 
   function switchBuiltInCart(cartName) {
@@ -1220,6 +1224,12 @@
   initKart64();
   initMario64();
   initStarFox64();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const autoRom = urlParams.get('rom');
+  if (autoRom) {
+    bootRealN64RomUrl(autoRom, decodeURIComponent(autoRom));
+  }
 
   let lastTime = performance.now();
   let frameCount = 0;
